@@ -135,7 +135,7 @@ class GlassIconButton extends StatelessWidget {
           color: Colors.transparent,
           child: InkWell(
             borderRadius: BorderRadius.circular(14),
-            onPressed: onPressed,
+            onTap: onPressed,
             child: Center(
               child: Icon(
                 icon,

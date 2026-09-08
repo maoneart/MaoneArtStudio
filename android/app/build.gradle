@@ -24,7 +24,7 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.maoneart.studio"
-    compileSdkVersion 34
+    compileSdkVersion 36
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
