@@ -1,0 +1,75 @@
+name: Build MaoneArt Studio APK
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Android Release APK
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Build Universal Release APK
+        run: flutter build apk --release --android-skip-build-dependency-validation
+
+      - name: Upload APK to Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: MaoneArtStudio-release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Create or Update GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/heads/main')
+        with:
+          tag_name: v1.0.0
+          name: 'MaoneArt Studio v1.0.0 (Release)'
+          body: |
+            ## ✨ MaoneArt Studio - Android Release APK (Photoroom Alternative)
+            
+            Aplikasi AI Photo Editor & Product Studio bertenaga Flutter dengan antarmuka MaoneArt Glassmorphism!
+            
+            ### 🚀 Fitur Unggulan:
+            - **1-Tap AI Magic Cutout**: Hapus latar belakang foto otomatis dengan presisi tinggi.
+            - **Studio Foto Produk E-Commerce**: Preset rasio 1:1 Shopee/Tokopedia, latar studio bersih, dan bayangan 3D.
+            - **Bayangan Realistis (3D Floor & Cast Shadow)**: Simulator bayangan lantai produk e-commerce dengan kontrol kelembutan, jarak, sudut, dan kepekatan.
+            - **Preset Latar Belakang Lengkap**:
+              - Transparan (PNG Lossless)
+              - Pas Foto Resmi (Merah Ganjil, Biru Genap, Putih E-KTP/Visa)
+              - Solid Studio & Katalog Toko Online
+              - Studio Lighting (Spotlight, Amber Glow, Emerald Botanic, Cyberpunk)
+              - Latar Belakang Kustom dari Galeri
+            - **Badge & Teks Toko**: Tambahkan badge promo ("BEST SELLER", "FLASH SALE", "DISKON 50%", "ORIGINAL 100%").
+            - **Studio Photo EQ**: Penyesuaian kecerahan, kontras, saturasi, dan suhu warna.
+            - **Interactive Multi-Layer Canvas**: Geser, cubit (pinch zoom & scale), rotasi, dan balik objek horizontal/vertikal.
+            - **Ekspor Resolusi Tinggi**: Dukungan format PNG & JPG hingga kualitas 4K Ultra HD.
+            
+            📥 **Download file APK di bawah ini dan instal langsung di perangkat Android Anda!**
+          files: build/app/outputs/flutter-apk/app-release.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
